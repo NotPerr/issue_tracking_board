@@ -2,6 +2,7 @@
 import { useAuthStatus } from "@/hooks/useAuthStatus";
 import IssueForm from "@/components/IssueForm";
 import { useState } from "react";
+import IssueList from "@/components/IssueList";
 
 export default function Content() {
   const { isLoading, isAuthenticated, isAuthor } = useAuthStatus();
@@ -10,12 +11,31 @@ export default function Content() {
   };
   const [showForm, setShowForm] = useState(false);
   const [message, setMessage] = useState(null);
+  const [refreshListKey, setRefreshListKey] = useState(0);
+
   const handleFormClose = (success, msg) => {
     setShowForm(false);
     if (msg) {
       setMessage({ type: success ? "success" : "error", text: msg });
       // Clear message after a few seconds
       setTimeout(() => setMessage(null), 5000);
+    }
+  };
+
+  const handleIssueAction = (success, msg) => {
+    // Hide the form if it was active
+    setShowForm(false);
+    console.log("refresh");
+    // Display message
+    if (msg) {
+      setMessage({ type: success ? "success" : "error", text: msg });
+      setTimeout(() => setMessage(null), 5000);
+    }
+    // If the action was successful, trigger a list refresh
+    if (success) {
+      setTimeout(() => {
+        setRefreshListKey((prevKey) => prevKey + 1); // Increment key to force IssueList re-render and re-fetch
+      }, 1000);
     }
   };
 
@@ -34,9 +54,18 @@ export default function Content() {
           >
             Create New Blog Post
           </button>
-          {showForm && <IssueForm onClose={handleFormClose} />}
+          {showForm && (
+            <IssueForm
+              onClose={handleFormClose}
+              onIssueAction={handleIssueAction}
+            />
+          )}
         </>
       )}
+      <IssueList
+        refreshListKey={refreshListKey}
+        onIssueAction={handleIssueAction}
+      />
     </>
   );
 }

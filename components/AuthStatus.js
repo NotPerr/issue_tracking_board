@@ -2,9 +2,6 @@ import { signIn, signOut } from "next-auth/react";
 import React from "react";
 import { useAuthStatus } from "@/hooks/useAuthStatus";
 
-const REPO_OWNER_GITHUB_ID = process.env.NEXT_PUBLIC_REPO_OWNER_GITHUB_ID;
-console.log("REPO_OWNER_GITHUB_ID: ", REPO_OWNER_GITHUB_ID);
-
 export default function AuthStatus() {
   const { session, isLoading, isAuthenticated, isAuthor } = useAuthStatus();
   if (isLoading) {
@@ -21,9 +18,6 @@ export default function AuthStatus() {
   if (session) {
     // User is authenticated
     // Access session properties. Remember, without TypeScript, these might be undefined, so check!
-    const currentUserId = session.githubId;
-    console.log("session: ", session);
-    console.log("currentUserId: ", currentUserId);
     const username = session.user?.name || session.username; // use session.username you stored
 
     if (isAuthenticated) {
@@ -61,7 +55,7 @@ export default function AuthStatus() {
     <div className="flex flex-col items-center justify-center p-6 bg-gray-100 rounded-lg shadow-lg">
       <p className="text-gray-800 text-xl font-bold mb-4">Not signed in</p>
       <button
-        onClick={() => signIn("github")} // Call signIn with 'github' provider
+        onClick={() => signIn("github", { prompt: "login" })} // Call signIn with 'github' provider
         className="px-8 py-4 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition duration-300 ease-in-out transform hover:scale-105"
       >
         Sign in with GitHub
