@@ -301,12 +301,6 @@ export default function IssueItem({ issue, onIssueAction }) {
                     className="prose-h1:text-xl text-gray-800 text-sm prose max-w-none"
                     dangerouslySetInnerHTML={{ __html: comment.bodyHTML }}
                   />
-                  {console.log(
-                    "Comment ID:",
-                    comment.id,
-                    "bodyHTML:",
-                    comment.bodyHTML
-                  )}
                 </div>
               ))}
               {issue.comments.totalCount > issue.comments.nodes.length && (

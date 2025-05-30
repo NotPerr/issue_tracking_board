@@ -6,87 +6,25 @@ import IssueItem from "@/components/IssueItem";
 import { useAuthStatus } from "@/hooks/useAuthStatus"; // To get the accessToken
 
 // IMPORTANT: Replace with your actual GitHub repository owner and name
-const GITHUB_REPO_OWNER = "NotPerr"; // Your GitHub username
-const GITHUB_REPO_NAME = "issue_tracking_board"; // Your repository name
-const ISSUES_PER_FETCH = 10; // Number of issues to fetch at a time
-const COMMENTS_PER_ISSUE = 5;
+//const ISSUES_PER_FETCH = 10; // Number of issues to fetch at a time
 
 export default function IssueList({ refreshListKey, onIssueAction }) {
-  const { session, status } = useAuthStatus(); // Get session for accessToken
-  const accessToken = session?.accessToken;
+  const { status } = useAuthStatus(); // Get session for accessToken
+  //const accessToken = session?.accessToken;
 
   const [issues, setIssues] = useState([]);
   const [endCursor, setEndCursor] = useState(null); // Cursor for GraphQL pagination
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [hasMore, setHasMore] = useState(true); // Indicates if there are more pages to load
-
+  const [isAuthStatusChecked, setIsAuthStatusChecked] = useState(false);
   const loader = useRef(null); // Ref for the element at the bottom of the list
-
-  // GraphQL query string
-  // 'states: OPEN' or 'states: CLOSED' or 'states: [OPEN, CLOSED]'
-  // Adjust 'states' as needed. For "all issues", use [OPEN, CLOSED].
-  // The 'bodyHTML' field can be useful if you want pre-rendered HTML.
-  const ISSUE_LIST_QUERY = `
-    query GetRepoIssues($owner: String!, $repo: String!, $first: Int!, $after: String) {
-      repository(owner: $owner, name: $repo) {
-        issues(first: $first, after: $after, states: [OPEN], orderBy: {field: CREATED_AT, direction: DESC}) {
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-          nodes {
-            id
-            number
-            title
-            body
-            createdAt
-            url
-            state
-            author {
-              login
-              url
-            }
-            labels(first: 5) {
-              nodes {
-                name
-                color
-              }
-            }
-              comments(first: ${COMMENTS_PER_ISSUE}, orderBy: {field: UPDATED_AT, direction: DESC}) {
-             nodes {
-                id
-                author {
-                  login
-                  url
-                }
-                bodyHTML
-                createdAt
-                updatedAt
-              }
-              totalCount
-            }
-          }
-        }
-      }
-    }
-  `;
 
   // Wrap fetchIssues in useCallback to prevent unnecessary re-creation
   const fetchIssues = useCallback(
     async (cursorToUse = null, isInitialFetch = false) => {
       console.log("fetch issue");
-      // Early exit if session isn't ready or if we don't have an accessToken
-      if (status === "loading" || !accessToken) {
-        if (status !== "loading") {
-          // Only set error if not actively loading auth status
-          setError(
-            "Authentication token required to fetch issues via GraphQL."
-          );
-          setHasMore(false);
-        }
-        return;
-      }
+
       // Prevent multiple fetches for subsequent pages if already loading or no more data
       if (!isInitialFetch && (isLoading || !hasMore)) {
         return;
@@ -96,92 +34,59 @@ export default function IssueList({ refreshListKey, onIssueAction }) {
       setError(null);
 
       try {
-        const response = await fetch("https://api.github.com/graphql", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-            Accept: "application/vnd.github.v4.graphql",
-          },
-          body: JSON.stringify({
-            query: ISSUE_LIST_QUERY,
-            variables: {
-              owner: GITHUB_REPO_OWNER,
-              repo: GITHUB_REPO_NAME,
-              first: ISSUES_PER_FETCH,
-              after: cursorToUse,
-            },
-          }),
-        });
+        const apiUrl = `/api/public-issues${
+          cursorToUse ? `?after=${cursorToUse}` : ""
+        }`;
 
-        const result = await response.json();
-
-        if (!response.ok || result.errors) {
-          console.error("GraphQL Errors:", result.errors);
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        if (!response.ok) {
+          console.error("Error from local API:", data.error);
           throw new Error(
-            result.errors?.[0]?.message || "Failed to fetch issues via GraphQL."
+            data.error || "Failed to fetch issues from local API."
           );
         }
 
-        const issuesData = result.data.repository.issues;
-        const newNodes = issuesData.nodes;
-        const pageInfo = issuesData.pageInfo;
+        const issuesData = data;
 
         setIssues((prevIssues) => {
-          // If it's an initial fetch (first page), replace the list
-          if (cursorToUse === null) {
-            return newNodes;
+          if (cursorToUse === null || isInitialFetch) {
+            return issuesData.nodes; // New issues for initial load
           }
-          // Otherwise, append new items, filtering duplicates
-          const uniqueNewNodes = newNodes.filter(
+          const uniqueNewNodes = issuesData.nodes.filter(
             (newNode) =>
               !prevIssues.some((oldNode) => oldNode.id === newNode.id)
           );
           return [...prevIssues, ...uniqueNewNodes];
         });
 
-        setEndCursor(pageInfo.endCursor);
-        setHasMore(pageInfo.hasNextPage);
+        setEndCursor(issuesData.pageInfo.endCursor);
+        setHasMore(issuesData.pageInfo.hasNextPage);
       } catch (err) {
-        console.error("Error fetching issues:", err);
-        setError(err.message || "Failed to load issues.");
+        console.error("Client-side error fetching issues from API:", err);
+        setError(err.message || "Failed to load blog posts.");
         setHasMore(false);
       } finally {
         setIsLoading(false);
       }
     },
-    [
-      accessToken,
-      status,
-      GITHUB_REPO_OWNER,
-      GITHUB_REPO_NAME,
-      ISSUES_PER_FETCH,
-      ISSUE_LIST_QUERY,
-    ]
+    [isLoading, hasMore]
   ); // Dependencies for useCallback
 
-  // Initial fetch when component mounts or accessToken becomes available
+  // Initial fetch when component mounts or refresh key changes
   useEffect(() => {
-    // Only fetch if session is authenticated and accessToken is ready
-    if (status === "authenticated" && accessToken) {
-      // Reset state for a fresh fetch (important if refreshListKey changes in parent)
+    // This effect should trigger a fetch whenever the auth status is known,
+    // or when a refresh is requested.
+    if (status !== "loading" && !isAuthStatusChecked) {
+      setIsAuthStatusChecked(true); // Mark that we've checked auth status
+      // Reset state for a fresh fetch
       setIssues([]);
       setEndCursor(null);
       setHasMore(true);
       setError(null);
-      fetchIssues(null, true); // Fetch the first page
-    } else if (status === "unauthenticated") {
-      // If not authenticated, clear issues and indicate no more to load (or handle differently)
-      // We can't fetch public repos with GraphQL without an access token
-      // or if token is not available yet.
-      setIssues([]);
-      setHasMore(false);
-      setIsLoading(false);
-      setError("Authentication required to fetch issues via GraphQL.");
-      // You might want to allow public access via REST API for non-auth users if needed.
-      // For GraphQL, generally an access token is needed even for public data due to rate limiting/structure.
+      fetchIssues(null, true); // Always attempt to fetch the first page
     }
-  }, [accessToken, status, refreshListKey, fetchIssues]); // Re-run when accessToken or auth status changes
+  }, [refreshListKey, fetchIssues, status, isAuthStatusChecked]);
 
   // Intersection Observer for infinite scrolling
   useEffect(() => {
