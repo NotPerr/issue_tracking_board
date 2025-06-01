@@ -65,9 +65,11 @@ export default function CommentForm({ show, onClose, issue, onIssueAction }) {
       }
 
       setNewCommentBody("");
-      onClose();
+
       // Notify parent to refresh the list, so the new comment appears
+      console.log("onIssueAction: ", onIssueAction);
       if (onIssueAction) {
+        console.log("call on issue action");
         onIssueAction(true, "Comment added successfully!");
       }
     } catch (err) {
@@ -78,6 +80,7 @@ export default function CommentForm({ show, onClose, issue, onIssueAction }) {
       }
     } finally {
       setIsProcessing(false);
+      onClose();
     }
   };
 

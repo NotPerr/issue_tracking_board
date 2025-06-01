@@ -3,7 +3,7 @@
 import { useState } from "react";
 import CommentForm from "../forms/CommentForm";
 
-export default function CommentFormButton({ issue, onIssueAction }) {
+export default function CommentFormButton({ issue, handleIssueAction }) {
   const [showCommentForm, setShowCommentForm] = useState(false);
 
   function onCommentFormClose() {
@@ -25,7 +25,7 @@ export default function CommentFormButton({ issue, onIssueAction }) {
         show={showCommentForm}
         onClose={onCommentFormClose}
         issue={issue}
-        onIssueAction={onIssueAction}
+        onIssueAction={handleIssueAction}
       />
     </>
   );

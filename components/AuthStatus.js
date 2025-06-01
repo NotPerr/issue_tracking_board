@@ -1,3 +1,4 @@
+"use client";
 import { signIn, signOut } from "next-auth/react";
 import React from "react";
 import { useAuthStatus } from "@/hooks/useAuthStatus";

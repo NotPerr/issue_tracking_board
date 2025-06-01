@@ -2,9 +2,10 @@
 "use client";
 
 import React, { useState } from "react";
-import IssueForm from "./IssueForm";
+import IssueForm from "./forms/IssueForm";
 import { useAuthStatus } from "@/hooks/useAuthStatus";
 import CommentFormButton from "./buttons/CommentFormButton";
+import { formatCommentDate } from "@/utils/format";
 export default function IssueItem({ issue, onIssueAction }) {
   // onIssueAction is a callback to notify parent (IssueList) of a change
   // Ensure the issue object structure matches the GraphQL query response
@@ -36,17 +37,6 @@ export default function IssueItem({ issue, onIssueAction }) {
       day: "numeric",
     }
   );
-
-  // Helper for formatting comment dates
-  const formatCommentDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
 
   // --- GraphQL Mutation for Closing an Issue ---
   const CLOSE_ISSUE_MUTATION = `
@@ -248,7 +238,7 @@ export default function IssueItem({ issue, onIssueAction }) {
 
       {/* --- Comment Form Button (only if logged in) --- */}
       {status === "authenticated" && (
-        <CommentFormButton onIssueAction={onIssueAction} issue={issue} />
+        <CommentFormButton handleIssueAction={onIssueAction} issue={issue} />
       )}
 
       {/* Action Buttons (only for author) */}

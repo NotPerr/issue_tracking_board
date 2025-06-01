@@ -8,11 +8,12 @@ export function useAuthStatus() {
   const isAuthenticated = status === "authenticated";
   const isAuthor =
     isAuthenticated && session?.githubId === REPO_OWNER_GITHUB_ID;
+
   return {
     session,
     isLoading,
     isAuthenticated,
     isAuthor,
-    status, // You might still want the raw status string
+    status,
   };
 }

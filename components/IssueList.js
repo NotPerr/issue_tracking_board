@@ -3,12 +3,10 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import IssueItem from "@/components/IssueItem";
-import { useAuthStatus } from "@/hooks/useAuthStatus"; // To get the accessToken
+import { useAuthStatus } from "@/hooks/useAuthStatus";
+import StatusLoading from "./loading/StatusLoading";
 
-// IMPORTANT: Replace with your actual GitHub repository owner and name
-//const ISSUES_PER_FETCH = 10; // Number of issues to fetch at a time
-
-export default function IssueList({ refreshListKey, onIssueAction }) {
+export default function IssueList({ refreshListKey, handleIssueAction }) {
   const { status } = useAuthStatus(); // Get session for accessToken
   //const accessToken = session?.accessToken;
 
@@ -89,6 +87,7 @@ export default function IssueList({ refreshListKey, onIssueAction }) {
 
   // --- Effect 2: Re-fetch when refreshListKey changes ---
   useEffect(() => {
+    console.log("refresh key: ", refreshListKey);
     // Only trigger if the key has been incremented from its initial value (0)
     if (refreshListKey > 0) {
       // Assuming refreshListKey starts at 0 and increments
@@ -131,16 +130,6 @@ export default function IssueList({ refreshListKey, onIssueAction }) {
     };
   }, [isLoading, hasMore, endCursor, fetchIssues]); // Re-run effect if dependencies change
 
-  if (status === "loading") {
-    return (
-      <div className="flex items-center justify-center p-4">
-        <p className="text-lg text-gray-600">
-          Checking authentication for issue access...
-        </p>
-      </div>
-    );
-  }
-
   // Show initial loading state only if no issues are loaded yet
   if (isLoading && issues.length === 0) {
     return (
@@ -174,11 +163,16 @@ export default function IssueList({ refreshListKey, onIssueAction }) {
 
   return (
     <div className="w-full mt-8 space-y-4">
+      <StatusLoading />
       <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
         All Blog Posts
       </h2>
       {issues.map((issue) => (
-        <IssueItem key={issue.id} issue={issue} onIssueAction={onIssueAction} />
+        <IssueItem
+          key={issue.id}
+          issue={issue}
+          onIssueAction={handleIssueAction}
+        />
       ))}
       {/* Loading indicator for subsequent pages */}
       {hasMore && isLoading && issues.length > 0 && (
