@@ -25,7 +25,6 @@ export default function Content() {
   const handleIssueAction = (success, msg) => {
     // Hide the form if it was active
     setShowForm(false);
-    console.log("refresh");
     // Display message
     if (msg) {
       setMessage({ type: success ? "success" : "error", text: msg });
@@ -33,9 +32,10 @@ export default function Content() {
     }
     // If the action was successful, trigger a list refresh
     if (success) {
+      console.log("modify refresh key");
       setTimeout(() => {
         setRefreshListKey((prevKey) => prevKey + 1); // Increment key to force IssueList re-render and re-fetch
-      }, 1000);
+      }, 2000);
     }
   };
 

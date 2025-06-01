@@ -2,8 +2,8 @@
 import NextAuth from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 
-const GITHUB_CLIENT_ID = process.env.CLIENT_ID; // Ensure this matches your .env.local
-const GITHUB_CLIENT_SECRET = process.env.CLIENT_SECRET; // Ensure this matches your .env.local
+const GITHUB_CLIENT_ID = process.env.CLIENT_ID;
+const GITHUB_CLIENT_SECRET = process.env.CLIENT_SECRET;
 const NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET;
 
 if (!GITHUB_CLIENT_ID) {
@@ -38,13 +38,10 @@ export const authOptions = {
 
       if (account) {
         token.accessToken = account.access_token;
-
-        // Check if profile exists and has the 'id' and 'login' properties
         if (profile) {
-          console.log("Profile ID:", profile.id); // Check if 'id' exists
-          console.log("Profile Login:", profile.login); // Check if 'login' exists
+          console.log("Profile ID:", profile.id);
+          console.log("Profile Login:", profile.login);
 
-          // Convert ID to string for consistency if your owner ID is a string
           token.githubId = String(profile.id);
           token.username = profile.login;
         } else {

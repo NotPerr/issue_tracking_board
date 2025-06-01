@@ -73,20 +73,36 @@ export default function IssueList({ refreshListKey, onIssueAction }) {
     [isLoading, hasMore]
   ); // Dependencies for useCallback
 
-  // Initial fetch when component mounts or refresh key changes
+  // --- Effect 1: Initial fetch when component mounts and auth status is known ---
   useEffect(() => {
-    // This effect should trigger a fetch whenever the auth status is known,
-    // or when a refresh is requested.
     if (status !== "loading" && !isAuthStatusChecked) {
-      setIsAuthStatusChecked(true); // Mark that we've checked auth status
-      // Reset state for a fresh fetch
+      setIsAuthStatusChecked(true); // Mark as checked to prevent re-running this specific effect
+      console.log("IssueList: Initial fetch triggered by auth status.");
+      // Reset state and perform initial fetch
       setIssues([]);
       setEndCursor(null);
       setHasMore(true);
       setError(null);
-      fetchIssues(null, true); // Always attempt to fetch the first page
+      fetchIssues(null, true);
     }
-  }, [refreshListKey, fetchIssues, status, isAuthStatusChecked]);
+  }, [fetchIssues, status, isAuthStatusChecked]); // Only dependencies for initial auth check
+
+  // --- Effect 2: Re-fetch when refreshListKey changes ---
+  useEffect(() => {
+    // Only trigger if the key has been incremented from its initial value (0)
+    if (refreshListKey > 0) {
+      // Assuming refreshListKey starts at 0 and increments
+      console.log(
+        `IssueList: Re-fetching triggered by refreshListKey: ${refreshListKey}`
+      );
+      // Reset state for a fresh fetch (not appending)
+      setIssues([]);
+      setEndCursor(null);
+      setHasMore(true);
+      setError(null);
+      fetchIssues(null, true); // Perform a full initial fetch
+    }
+  }, [refreshListKey]);
 
   // Intersection Observer for infinite scrolling
   useEffect(() => {
