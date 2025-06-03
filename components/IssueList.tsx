@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// components/IssueList.js
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
@@ -24,13 +23,12 @@ export default function IssueList({
   handleIssueAction,
 }: IssueListProps) {
   const { status } = useAuthStatus(); // Get session for accessToken
-  //const accessToken = session?.accessToken;
 
   const [issues, setIssues] = useState<IssueNode[]>(initialIssues);
   const [endCursor, setEndCursor] = useState<string | null>(initialEndCursor); // Cursor for GraphQL pagination
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [hasMore, setHasMore] = useState(initialHasNextPage); // Indicates if there are more pages to load
+  const [hasMore, setHasMore] = useState(initialHasNextPage);
   const loader = useRef<HTMLDivElement>(null); // Ref for the element at the bottom of the list
   // Use a ref to track if it's the very first render of this component.
   // This helps prevent `useEffect` from running on mount if `initialIssues` already provides data.
@@ -111,7 +109,7 @@ export default function IssueList({
     setHasMore(true);
     setError(null);
     fetchIssues(null, true); // Perform a full re-fetch from the beginning
-  }, [refreshListKey, fetchIssues]); // Dependencies: refreshListKey and the memoized fetchIssues
+  }, [refreshListKey, fetchIssues]);
 
   // --- Effect for Infinite Scrolling (Intersection Observer) ---
   useEffect(() => {

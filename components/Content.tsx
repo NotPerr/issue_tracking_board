@@ -2,11 +2,10 @@
 "use client";
 import { useState } from "react";
 import IssueList from "@/components/IssueList";
-import StatusLoading from "@/components/loading/StatusLoading";
 import CreateIssueButton from "@/components/buttons/CreateIssueButton";
 import { IssueNode } from "@/types/github";
 
-// FIX: Define ContentProps interface and use it for the component's props
+// Define ContentProps interface and use it for the component's props
 interface ContentProps {
   initialIssues: IssueNode[];
   initialEndCursor: string | null;
