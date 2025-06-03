@@ -1,21 +1,38 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuthStatus } from "@/hooks/useAuthStatus";
+
+// Define the type for initialData if in edit mode
+interface InitialIssueData {
+  issueId: string; // GitHub's global ID for the issue
+  title: string;
+  body: string;
+  // Add any other properties you might need from initialData for editing
+}
+
+// Define the props interface for IssueForm
+interface IssueFormProps {
+  onClose: (success: boolean, msg: string) => void; // Function to close the form, with success status and message
+  mode?: "create" | "edit"; // Optional: 'create' or 'edit' mode, defaults to 'create'
+  initialData?: InitialIssueData; // Optional: Data to pre-fill form in edit mode
+  onIssueAction: (success: boolean, msg: string) => void; // Callback for when an issue action (create/update) completes
+}
 
 export default function IssueForm({
   onClose,
-  mode = "create",
+  mode = "create", // Default value for mode
   initialData,
-  onIssueAction,
-}) {
+  onIssueAction, // Now explicitly typed
+}: IssueFormProps) {
   const { session } = useAuthStatus();
   const accessToken = session?.accessToken;
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   const GITHUB_REPO_OWNER = "NotPerr";
   const GITHUB_REPO_NAME = "issue_tracking_board";
@@ -74,7 +91,7 @@ export default function IssueForm({
     }
   `;
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null); // Clear previous errors
 
@@ -163,7 +180,7 @@ export default function IssueForm({
       // Call onClose with success = true and message
 
       onClose(true, successMessage);
-    } catch (err) {
+    } catch (err: any) {
       console.error(`Error ${mode}ing issue:`, err);
       setError(err.message || `Failed to ${mode} issue.`);
       // Call onClose with success = false and error message
@@ -208,7 +225,7 @@ export default function IssueForm({
               id="body"
               value={body}
               onChange={(e) => setBody(e.target.value)}
-              rows="8"
+              rows={8}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline resize-y"
               disabled={isLoading}
             ></textarea>

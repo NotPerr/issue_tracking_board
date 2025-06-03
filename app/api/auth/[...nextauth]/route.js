@@ -31,17 +31,9 @@ export const authOptions = {
   secret: NEXTAUTH_SECRET,
   callbacks: {
     async jwt({ token, account, profile }) {
-      console.log("--- JWT Callback ---");
-      console.log("Initial Token:", token);
-      console.log("Account (during login):", account);
-      console.log("Profile (during login):", profile); // This is where GitHub's user data comes from
-
       if (account) {
         token.accessToken = account.access_token;
         if (profile) {
-          console.log("Profile ID:", profile.id);
-          console.log("Profile Login:", profile.login);
-
           token.githubId = String(profile.id);
           token.username = profile.login;
         } else {
@@ -52,16 +44,11 @@ export const authOptions = {
           "JWT Callback: Not an initial login, account is undefined."
         );
       }
-
-      console.log("Token after modifications in JWT:", token);
       console.log("--------------------");
       return token;
     },
 
     async session({ session, token }) {
-      console.log("--- SESSION Callback ---");
-      console.log("Token received in Session Callback:", token);
-
       // Ensure that 'accessToken', 'githubId', and 'username' are actually present on the 'token'
       // before assigning them to 'session'.
       if (token.accessToken) {
@@ -85,9 +72,6 @@ export const authOptions = {
       } else {
         console.warn("Session Callback: username is missing from token.");
       }
-
-      console.log("Session after modifications in Session:", session);
-      console.log("------------------------");
       return session;
     },
   },

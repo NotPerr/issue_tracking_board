@@ -7,3 +7,11 @@ export const formatCommentDate = (dateString) => {
     minute: "2-digit",
   });
 };
+
+export const formatIssueDate = (dateString) => {
+  return new Date(dateString).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};

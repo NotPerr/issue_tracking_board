@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // components/IssueList.js
 "use client";
 
@@ -5,26 +6,44 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import IssueItem from "@/components/IssueItem";
 import { useAuthStatus } from "@/hooks/useAuthStatus";
 import StatusLoading from "./loading/StatusLoading";
+import { IssueNode } from "@/types/github";
 
-export default function IssueList({ refreshListKey, handleIssueAction }) {
+interface IssueListProps {
+  initialIssues: IssueNode[];
+  initialEndCursor: string | null;
+  initialHasNextPage: boolean;
+  refreshListKey: number;
+  handleIssueAction: (success: boolean, msg: string) => void;
+}
+
+export default function IssueList({
+  initialIssues,
+  initialEndCursor,
+  initialHasNextPage,
+  refreshListKey,
+  handleIssueAction,
+}: IssueListProps) {
   const { status } = useAuthStatus(); // Get session for accessToken
   //const accessToken = session?.accessToken;
 
-  const [issues, setIssues] = useState([]);
-  const [endCursor, setEndCursor] = useState(null); // Cursor for GraphQL pagination
+  const [issues, setIssues] = useState<IssueNode[]>(initialIssues);
+  const [endCursor, setEndCursor] = useState<string | null>(initialEndCursor); // Cursor for GraphQL pagination
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [hasMore, setHasMore] = useState(true); // Indicates if there are more pages to load
-  const [isAuthStatusChecked, setIsAuthStatusChecked] = useState(false);
-  const loader = useRef(null); // Ref for the element at the bottom of the list
-
-  // Wrap fetchIssues in useCallback to prevent unnecessary re-creation
+  const [error, setError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(initialHasNextPage); // Indicates if there are more pages to load
+  const loader = useRef<HTMLDivElement>(null); // Ref for the element at the bottom of the list
+  // Use a ref to track if it's the very first render of this component.
+  // This helps prevent `useEffect` from running on mount if `initialIssues` already provides data.
+  const isMounted = useRef(false);
   const fetchIssues = useCallback(
-    async (cursorToUse = null, isInitialFetch = false) => {
-      console.log("fetch issue");
+    async (
+      cursorToUse: string | null = null,
+      isFullRefresh: boolean = false
+    ) => {
+      console.log("IssueList: Fetch triggered.");
 
-      // Prevent multiple fetches for subsequent pages if already loading or no more data
-      if (!isInitialFetch && (isLoading || !hasMore)) {
+      if (!isFullRefresh && (isLoading || !hasMore)) {
+        console.log("IssueList: Skipping fetch (loading or no more data).");
         return;
       }
 
@@ -35,75 +54,66 @@ export default function IssueList({ refreshListKey, handleIssueAction }) {
         const apiUrl = `/api/public-issues${
           cursorToUse ? `?after=${cursorToUse}` : ""
         }`;
-
         const response = await fetch(apiUrl);
         const data = await response.json();
-        if (!response.ok) {
-          console.error("Error from local API:", data.error);
+
+        if (!response.ok || data.error) {
           throw new Error(
             data.error || "Failed to fetch issues from local API."
           );
         }
 
-        const issuesData = data;
+        if (!data.nodes || !data.pageInfo) {
+          throw new Error(
+            "Invalid data structure received from /api/public-issues."
+          );
+        }
 
         setIssues((prevIssues) => {
-          if (cursorToUse === null || isInitialFetch) {
-            return issuesData.nodes; // New issues for initial load
+          if (isFullRefresh) {
+            return data.nodes;
           }
-          const uniqueNewNodes = issuesData.nodes.filter(
-            (newNode) =>
+          const uniqueNewNodes = data.nodes.filter(
+            (newNode: IssueNode) =>
               !prevIssues.some((oldNode) => oldNode.id === newNode.id)
           );
           return [...prevIssues, ...uniqueNewNodes];
         });
 
-        setEndCursor(issuesData.pageInfo.endCursor);
-        setHasMore(issuesData.pageInfo.hasNextPage);
-      } catch (err) {
-        console.error("Client-side error fetching issues from API:", err);
+        setEndCursor(data.pageInfo.endCursor);
+        setHasMore(data.pageInfo.hasNextPage);
+      } catch (err: any) {
+        console.error("Client-side error fetching issues:", err);
         setError(err.message || "Failed to load blog posts.");
         setHasMore(false);
       } finally {
         setIsLoading(false);
       }
     },
-    [isLoading, hasMore]
-  ); // Dependencies for useCallback
+    []
+  );
 
-  // --- Effect 1: Initial fetch when component mounts and auth status is known ---
+  // --- Effect for Refreshing (triggered by refreshListKey) ---
   useEffect(() => {
-    if (status !== "loading" && !isAuthStatusChecked) {
-      setIsAuthStatusChecked(true); // Mark as checked to prevent re-running this specific effect
-      console.log("IssueList: Initial fetch triggered by auth status.");
-      // Reset state and perform initial fetch
-      setIssues([]);
-      setEndCursor(null);
-      setHasMore(true);
-      setError(null);
-      fetchIssues(null, true);
+    // Set isMounted to true after the first render.
+    // This ensures the effect doesn't run on the very first mount.
+    if (!isMounted.current) {
+      isMounted.current = true;
+      return; // Skip the first render
     }
-  }, [fetchIssues, status, isAuthStatusChecked]); // Only dependencies for initial auth check
 
-  // --- Effect 2: Re-fetch when refreshListKey changes ---
-  useEffect(() => {
-    console.log("refresh key: ", refreshListKey);
-    // Only trigger if the key has been incremented from its initial value (0)
-    if (refreshListKey > 0) {
-      // Assuming refreshListKey starts at 0 and increments
-      console.log(
-        `IssueList: Re-fetching triggered by refreshListKey: ${refreshListKey}`
-      );
-      // Reset state for a fresh fetch (not appending)
-      setIssues([]);
-      setEndCursor(null);
-      setHasMore(true);
-      setError(null);
-      fetchIssues(null, true); // Perform a full initial fetch
-    }
-  }, [refreshListKey]);
+    console.log(
+      `IssueList: refreshListKey changed to ${refreshListKey}, triggering full re-fetch.`
+    );
+    // Reset state to clear current issues and prepare for a fresh fetch
+    setIssues([]);
+    setEndCursor(null);
+    setHasMore(true);
+    setError(null);
+    fetchIssues(null, true); // Perform a full re-fetch from the beginning
+  }, [refreshListKey, fetchIssues]); // Dependencies: refreshListKey and the memoized fetchIssues
 
-  // Intersection Observer for infinite scrolling
+  // --- Effect for Infinite Scrolling (Intersection Observer) ---
   useEffect(() => {
     const options = {
       root: null, // Use the viewport as the root
@@ -115,6 +125,9 @@ export default function IssueList({ refreshListKey, handleIssueAction }) {
       const target = entries[0];
       // If the target is intersecting, not currently loading, and there's more data
       if (target.isIntersecting && !isLoading && hasMore) {
+        console.log(
+          "IssueList: IntersectionObserver triggered fetch for next page."
+        );
         fetchIssues(endCursor); // Fetch next page using the current endCursor
       }
     }, options);
@@ -145,8 +158,7 @@ export default function IssueList({ refreshListKey, handleIssueAction }) {
         <p className="text-lg">Error loading blog posts: {error}</p>
         {status === "unauthenticated" && (
           <p className="text-sm text-gray-500 mt-2">
-            Please sign in to view posts, as GitHub GraphQL API often requires
-            authentication.
+            GitHub GraphQL API often requires authentication.
           </p>
         )}
       </div>

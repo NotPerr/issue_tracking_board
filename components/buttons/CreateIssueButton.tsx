@@ -3,22 +3,32 @@ import { useAuthStatus } from "@/hooks/useAuthStatus";
 import IssueForm from "../forms/IssueForm";
 import { useState } from "react";
 
-export default function CreateIssueButton() {
-  const { isAuthenticated, isAuthor, handleIssueAction } = useAuthStatus();
+// Define props interface for CreateIssueButton
+interface CreateIssueButtonProps {
+  handleIssueAction: (success: boolean, msg: string) => void; // Now receives this as a prop
+}
+
+export default function CreateIssueButton({
+  handleIssueAction,
+}: CreateIssueButtonProps) {
+  const { isAuthenticated, isAuthor } = useAuthStatus();
   const [showForm, setShowForm] = useState(false);
-  const [message, setMessage] = useState(null);
+  const [message, setMessage] = useState<{ type: string; text: string } | null>(
+    null
+  );
 
   const handleCreateNewIssue = () => {
     setShowForm(true);
   };
 
-  const handleFormClose = (success, msg) => {
+  const handleFormClose = (success: boolean, msg: string) => {
     setShowForm(false);
     if (msg) {
       setMessage({ type: success ? "success" : "error", text: msg });
       // Clear message after a few seconds
       setTimeout(() => setMessage(null), 5000);
     }
+    handleIssueAction(success, msg);
   };
 
   return (

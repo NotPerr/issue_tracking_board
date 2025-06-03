@@ -1,5 +1,3 @@
-// app/api/public-issues/route.js
-
 import { NextResponse } from "next/server";
 
 const GITHUB_REPO_OWNER = "NotPerr";

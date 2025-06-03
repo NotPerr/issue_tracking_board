@@ -5,14 +5,13 @@ import React, { useState } from "react";
 import IssueForm from "./forms/IssueForm";
 import { useAuthStatus } from "@/hooks/useAuthStatus";
 import CommentFormButton from "./buttons/CommentFormButton";
-import { formatCommentDate } from "@/utils/format";
+import { formatCommentDate, formatIssueDate } from "@/utils/format";
 export default function IssueItem({ issue, onIssueAction }) {
   // onIssueAction is a callback to notify parent (IssueList) of a change
   // Ensure the issue object structure matches the GraphQL query response
   // Example GraphQL fields: id, number, title, body, createdAt, url, state, author { login, url }, labels { nodes { name, color } }
   const { session, status, isAuthor } = useAuthStatus();
 
-  const currentUserLogin = session?.user?.login;
   // State to control the visibility of the edit form
   const [showEditForm, setShowEditForm] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false); // For loading state of close/update buttons
@@ -29,14 +28,7 @@ export default function IssueItem({ issue, onIssueAction }) {
   }
 
   // Format the creation date
-  const createdAtDate = new Date(issue.createdAt).toLocaleDateString(
-    undefined,
-    {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }
-  );
+  const createdAtDate = formatIssueDate(issue.createdAt);
 
   // --- GraphQL Mutation for Closing an Issue ---
   const CLOSE_ISSUE_MUTATION = `
