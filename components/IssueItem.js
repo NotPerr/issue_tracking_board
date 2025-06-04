@@ -276,7 +276,8 @@ export default function IssueItem({ issue, onIssueAction }) {
             body: issue.body,
             issueId: issue.id, // Pass global ID for update mutation
           }}
-          onClose={handleEditFormClose} // Callback for closing the form
+          onClose={handleEditFormClose}
+          onIssueAction={onIssueAction}
         />
       )}
 

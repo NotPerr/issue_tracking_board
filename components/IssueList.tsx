@@ -4,7 +4,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import IssueItem from "@/components/IssueItem";
 import { useAuthStatus } from "@/hooks/useAuthStatus";
-import StatusLoading from "./loading/StatusLoading";
 import { IssueNode } from "@/types/github";
 
 interface IssueListProps {
@@ -99,10 +98,6 @@ export default function IssueList({
       isMounted.current = true;
       return; // Skip the first render
     }
-
-    console.log(
-      `IssueList: refreshListKey changed to ${refreshListKey}, triggering full re-fetch.`
-    );
     // Reset state to clear current issues and prepare for a fresh fetch
     setIssues([]);
     setEndCursor(null);
@@ -123,9 +118,6 @@ export default function IssueList({
       const target = entries[0];
       // If the target is intersecting, not currently loading, and there's more data
       if (target.isIntersecting && !isLoading && hasMore) {
-        console.log(
-          "IssueList: IntersectionObserver triggered fetch for next page."
-        );
         fetchIssues(endCursor); // Fetch next page using the current endCursor
       }
     }, options);
@@ -173,7 +165,6 @@ export default function IssueList({
 
   return (
     <div className="w-full mt-8 space-y-4">
-      <StatusLoading />
       <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
         All Blog Posts
       </h2>

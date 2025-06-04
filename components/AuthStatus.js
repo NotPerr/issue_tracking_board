@@ -2,24 +2,17 @@
 import { signIn, signOut } from "next-auth/react";
 import React from "react";
 import { useAuthStatus } from "@/hooks/useAuthStatus";
+import StatusLoading from "./loading/StatusLoading";
 
 export default function AuthStatus() {
   const { session, isLoading, isAuthenticated, isAuthor } = useAuthStatus();
   if (isLoading) {
-    // Show a loading state while the session is being fetched
-    return (
-      <div className="flex items-center justify-center p-4 bg-blue-100 rounded-md shadow-md">
-        <p className="text-blue-800 text-lg font-semibold">
-          Loading authentication status...
-        </p>
-      </div>
-    );
+    return <StatusLoading />;
   }
 
   if (session) {
     // User is authenticated
-    // Access session properties. Remember, without TypeScript, these might be undefined, so check!
-    const username = session.user?.name || session.username; // use session.username you stored
+    const username = session.user?.name || session.username;
 
     if (isAuthenticated) {
       return (
@@ -41,7 +34,7 @@ export default function AuthStatus() {
             </p>
           )}
           <button
-            onClick={() => signOut()} // Call signOut to log out
+            onClick={() => signOut()}
             className="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition duration-300 ease-in-out transform hover:scale-105"
           >
             Sign out

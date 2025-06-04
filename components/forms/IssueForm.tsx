@@ -14,7 +14,7 @@ interface InitialIssueData {
 
 // Define the props interface for IssueForm
 interface IssueFormProps {
-  onClose: (success: boolean, msg: string) => void; // Function to close the form, with success status and message
+  onClose: () => void;
   mode?: "create" | "edit"; // Optional: 'create' or 'edit' mode, defaults to 'create'
   initialData?: InitialIssueData; // Optional: Data to pre-fill form in edit mode
   onIssueAction: (success: boolean, msg: string) => void; // Callback for when an issue action (create/update) completes
@@ -24,7 +24,7 @@ export default function IssueForm({
   onClose,
   mode = "create", // Default value for mode
   initialData,
-  onIssueAction, // Now explicitly typed
+  onIssueAction,
 }: IssueFormProps) {
   const { session } = useAuthStatus();
   const accessToken = session?.accessToken;
@@ -143,7 +143,7 @@ export default function IssueForm({
         }
         const repoId = repoIdResult.data.repository.id;
         variables = { repoId, title, body };
-        onIssueAction(true, "Blog created successfully!");
+        onIssueAction(true, successMessage);
       } else {
         // mode === "edit"
         mutationQuery = UPDATE_ISSUE_MUTATION;
@@ -153,38 +153,35 @@ export default function IssueForm({
           throw new Error("Issue ID is missing for update operation.");
         }
         variables = { id: initialData.issueId, title, body };
+        const response = await fetch("https://api.github.com/graphql", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+            Accept: "application/vnd.github.v4.graphql",
+          },
+          body: JSON.stringify({
+            query: mutationQuery,
+            variables,
+          }),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || result.errors) {
+          console.error("GraphQL Errors:", result.errors);
+          throw new Error(
+            result.errors?.[0]?.message ||
+              `Failed to ${mode} issue via GraphQL.`
+          );
+        }
+        onIssueAction(true, successMessage);
       }
-
-      const response = await fetch("https://api.github.com/graphql", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-          Accept: "application/vnd.github.v4.graphql",
-        },
-        body: JSON.stringify({
-          query: mutationQuery,
-          variables,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok || result.errors) {
-        console.error("GraphQL Errors:", result.errors);
-        throw new Error(
-          result.errors?.[0]?.message || `Failed to ${mode} issue via GraphQL.`
-        );
-      }
-
-      // Call onClose with success = true and message
-
-      onClose(true, successMessage);
+      onClose();
     } catch (err: any) {
       console.error(`Error ${mode}ing issue:`, err);
       setError(err.message || `Failed to ${mode} issue.`);
-      // Call onClose with success = false and error message
-      onClose(false, err.message || `Failed to ${mode} issue.`);
+      onIssueAction(false, err.message);
     } finally {
       setIsLoading(false);
     }
@@ -234,7 +231,7 @@ export default function IssueForm({
           <div className="flex items-center justify-end gap-3">
             <button
               type="button"
-              onClick={() => onClose(false, "Form cancelled.")} // Pass false for cancellation
+              onClick={() => onClose()}
               className="bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-md hover:bg-gray-400 transition-colors duration-200"
               disabled={isLoading}
             >

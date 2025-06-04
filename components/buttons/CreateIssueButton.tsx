@@ -13,22 +13,13 @@ export default function CreateIssueButton({
 }: CreateIssueButtonProps) {
   const { isAuthenticated, isAuthor } = useAuthStatus();
   const [showForm, setShowForm] = useState(false);
-  const [message, setMessage] = useState<{ type: string; text: string } | null>(
-    null
-  );
 
   const handleCreateNewIssue = () => {
     setShowForm(true);
   };
 
-  const handleFormClose = (success: boolean, msg: string) => {
+  const handleFormClose = () => {
     setShowForm(false);
-    if (msg) {
-      setMessage({ type: success ? "success" : "error", text: msg });
-      // Clear message after a few seconds
-      setTimeout(() => setMessage(null), 5000);
-    }
-    handleIssueAction(success, msg);
   };
 
   return (
@@ -48,7 +39,6 @@ export default function CreateIssueButton({
               onIssueAction={handleIssueAction}
             />
           )}
-          {message && <p>{message.text}</p>}
         </>
       )}
     </>

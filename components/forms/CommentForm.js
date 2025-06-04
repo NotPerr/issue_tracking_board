@@ -63,13 +63,10 @@ export default function CommentForm({ show, onClose, issue, onIssueAction }) {
           result.errors?.[0]?.message || "Failed to add comment via GraphQL."
         );
       }
-
       setNewCommentBody("");
 
       // Notify parent to refresh the list, so the new comment appears
-      console.log("onIssueAction: ", onIssueAction);
       if (onIssueAction) {
-        console.log("call on issue action");
         onIssueAction(true, "Comment added successfully!");
       }
     } catch (err) {
@@ -102,9 +99,9 @@ export default function CommentForm({ show, onClose, issue, onIssueAction }) {
           <div className="flex justify-end gap-2 mt-3">
             <button
               onClick={() => {
-                setNewCommentBody(""); // Clear input
+                setNewCommentBody("");
                 onClose();
-                setActionError(null); // Clear any error
+                setActionError(null);
               }}
               disabled={isProcessing}
               className="px-4 py-2 bg-gray-300 text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-400 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"

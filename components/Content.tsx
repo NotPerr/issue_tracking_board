@@ -4,6 +4,7 @@ import { useState } from "react";
 import IssueList from "@/components/IssueList";
 import CreateIssueButton from "@/components/buttons/CreateIssueButton";
 import { IssueNode } from "@/types/github";
+import toast from "react-hot-toast";
 
 // Define ContentProps interface and use it for the component's props
 interface ContentProps {
@@ -21,10 +22,10 @@ export default function Content({
 }: ContentProps) {
   const [refreshListKey, setRefreshListKey] = useState(0);
   const handleIssueAction = (success: boolean, msg: string) => {
-    // If the action was successful, trigger a list refresh
-    console.log("change refresh key");
+    // If the action was successful, trigger a list refresh and show notification
     if (success) {
       console.log({ msg });
+      toast.success(msg);
       setTimeout(() => {
         setRefreshListKey((prevKey) => prevKey + 1);
       }, 1000);

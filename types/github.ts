@@ -1,5 +1,3 @@
-// types/github.d.ts (or types/github.ts)
-
 // Interfaces for GitHub GraphQL Issue data
 export interface GitHubAuthor {
   login: string;

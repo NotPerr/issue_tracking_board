@@ -3,6 +3,7 @@ import Content from "@/components/Content";
 import NextAuthSessionProvider from "@/providers/NextAuthSessionProvider";
 import { getIssues } from "@/lib/github";
 import { IssueDataResponse } from "@/types/github";
+import { Toaster } from "react-hot-toast";
 
 export default async function Home() {
   // --- Server-side fetching for initial issues ---
@@ -14,6 +15,7 @@ export default async function Home() {
       <NextAuthSessionProvider>
         <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
           <AuthStatus />
+          <Toaster position="top-right" reverseOrder={false} />
           <Content
             initialIssues={initialIssuesData.nodes || []}
             initialEndCursor={initialIssuesData.pageInfo?.endCursor || null}
