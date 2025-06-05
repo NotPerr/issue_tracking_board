@@ -28,7 +28,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "app/api/auth/[...nextauth]/route.js",
-    "components/AuthStatus.js"
+    "components/AuthStatus.js",
+    "lib/auth.js"
   ],
   "exclude": ["node_modules"]
 }
