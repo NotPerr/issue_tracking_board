@@ -16,16 +16,21 @@ export default function AuthStatus() {
 
     if (isAuthenticated) {
       return (
-        <div className="flex flex-col items-center justify-center p-6 bg-green-100 rounded-lg shadow-lg">
+        <div className="mx-auto flex flex-col items-center justify-center p-6 bg-green-100 rounded-lg shadow-lg">
           <p className="text-green-800 text-xl font-bold mb-3">
             Signed in as <span className="text-green-900">{username}</span>
           </p>
           {isAuthor ? (
-            <p className="text-green-700 text-lg font-medium mb-4">
-              You are the{" "}
-              <span className="text-green-900 font-bold">repository owner</span>
-              ! You have full access.
-            </p>
+            <div className="text-green-700 text-lg font-medium mb-4 text-center">
+              <p>
+                You are the{" "}
+                <span className="text-green-900 font-bold">
+                  repository owner
+                </span>
+                !
+              </p>
+              <p>You have full access.</p>
+            </div>
           ) : (
             <p className="text-green-700 text-lg font-medium mb-4">
               You are a{" "}

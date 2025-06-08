@@ -29,7 +29,7 @@ export default function CreateIssueButton({
         <>
           <button
             onClick={handleCreateNewIssue}
-            className="px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105 mt-4"
+            className="mx-auto px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105 mt-4"
           >
             Create New Blog Post
           </button>

@@ -164,7 +164,7 @@ export default function IssueList({
   }
 
   return (
-    <div className="w-full mt-8 space-y-4">
+    <div className="mt-8 space-y-4 max-w-full">
       <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
         All Blog Posts
       </h2>
