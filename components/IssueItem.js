@@ -275,8 +275,9 @@ export default function IssueItem({ issue, onIssueAction }) {
           />
         )}
 
-        {/* Link to GitHub Issue - always visible */}
-        {!showEditForm && ( // Hide the original link when form is open to avoid clutter
+        {/* Link to GitHub Issue - only if login user is owner */}
+        {!showEditForm && isAuthor && (
+          // Hide the original link when form is open to avoid clutter
           <a
             href={issue.url}
             target="_blank"

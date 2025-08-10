@@ -1,9 +1,9 @@
-import AuthStatus from "@/components/AuthStatus";
 import Content from "@/components/Content";
 import NextAuthSessionProvider from "@/providers/NextAuthSessionProvider";
 import { getIssues } from "@/lib/github";
 import { IssueDataResponse } from "@/types/github";
 import { Toaster } from "react-hot-toast";
+import NavBar from "@/components/NavBar";
 
 export default async function Home() {
   // --- Server-side fetching for initial issues ---
@@ -13,8 +13,8 @@ export default async function Home() {
     <div className="grid  items-center justify-items-center min-h-screen pb-20 gap-16 font-[family-name:var(--font-geist-sans)]">
       {" "}
       <NextAuthSessionProvider>
-        <main className="flex flex-col row-start-2 items-center sm:items-start max-w-screen">
-          <AuthStatus />
+        <main className="flex flex-col  items-center sm:items-start w-screen">
+          <NavBar />
           <Toaster position="top-right" reverseOrder={false} />
           <Content
             initialIssues={initialIssuesData.nodes || []}
