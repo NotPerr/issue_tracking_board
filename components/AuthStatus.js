@@ -16,7 +16,7 @@ export default function AuthStatus() {
 
     if (isAuthenticated) {
       return (
-        <div className="mx-auto flex flex-col items-center justify-center bg-green-100 rounded-lg shadow-lg">
+        <div className="p-2 mx-auto flex flex-col items-center justify-center bg-green-100 rounded-lg shadow-lg">
           <p className="text-green-800 text-xl font-bold mb-3">
             Signed in as <span className="text-green-900">{username}</span>
           </p>
@@ -40,7 +40,7 @@ export default function AuthStatus() {
           )}
           <button
             onClick={() => signOut()}
-            className="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition duration-300 ease-in-out transform hover:scale-105"
+            className="px-3 py-1 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition duration-300 ease-in-out transform hover:scale-105"
           >
             Sign out
           </button>
@@ -55,7 +55,7 @@ export default function AuthStatus() {
       <p className="text-gray-800 text-lg font-bold mb-4">Not signed in</p>
       <button
         onClick={() => signIn("github", { prompt: "login" })} // Call signIn with 'github' provider
-        className="px-8 py-4 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition duration-300 ease-in-out transform hover:scale-105"
+        className="px-3 py-4 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition duration-300 ease-in-out transform hover:scale-105"
       >
         Sign in with GitHub
       </button>

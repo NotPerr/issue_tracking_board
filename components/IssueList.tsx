@@ -164,17 +164,20 @@ export default function IssueList({
   }
 
   return (
-    <div className="mt-8 space-y-4 max-w-full">
+    <div className="mt-8 space-y-4 max-w-full ">
       <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">
         All Blog Posts
       </h2>
-      {issues.map((issue) => (
-        <IssueItem
-          key={issue.id}
-          issue={issue}
-          onIssueAction={handleIssueAction}
-        />
-      ))}
+      <div className="grid p-5 w-full grid-cols-1 gap-y-2 md:grid-cols-2 md:gap-x-2">
+        {issues.map((issue) => (
+          <IssueItem
+            key={issue.id}
+            issue={issue}
+            onIssueAction={handleIssueAction}
+          />
+        ))}
+      </div>
+
       {/* Loading indicator for subsequent pages */}
       {hasMore && isLoading && issues.length > 0 && (
         <div className="flex items-center justify-center p-4">

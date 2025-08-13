@@ -6,10 +6,14 @@ import { Popover } from "antd";
 
 export default function NavBar() {
   return (
-    <nav className="flex w-full justify-between pt-5">
+    <nav className="flex w-full justify-between pt-7 px-5">
       <div></div>
       <div>
-        <Popover content={<AuthStatus />} trigger="click" placement="left">
+        <Popover
+          content={<AuthStatus />}
+          trigger="click"
+          placement="leftBottom"
+        >
           <Button type="text" icon={<UserOutlined />} size="large" />
         </Popover>
       </div>

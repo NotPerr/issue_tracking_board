@@ -108,7 +108,7 @@ export default function IssueItem({ issue, onIssueAction }) {
   };
 
   return (
-    <div className="max-w-5/6 bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow duration-200 flex flex-col justify-center mx-auto">
+    <div className="col-span-1 bg-white p-6 rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow duration-200 flex flex-col justify-center ">
       {/* ====== issue content start ====== */}
       <div className="max-w-full">
         <h3 className="text-xl font-semibold text-blue-700 mb-2">
@@ -178,7 +178,7 @@ export default function IssueItem({ issue, onIssueAction }) {
                 {issue.comments.nodes.map((comment) => (
                   <div
                     key={comment.id}
-                    className="bg-gray-50 p-3 rounded-md border border-gray-200"
+                    className="bg-gray-50 p-1 rounded-md border border-gray-200"
                   >
                     <p className="text-sm text-gray-600 mb-1">
                       <a

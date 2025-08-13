@@ -13,7 +13,7 @@ export default async function Home() {
     <div className="grid  items-center justify-items-center min-h-screen pb-20 gap-16 font-[family-name:var(--font-geist-sans)]">
       {" "}
       <NextAuthSessionProvider>
-        <main className="flex flex-col  items-center sm:items-start w-screen">
+        <main className="flex flex-col  items-center sm:items-start max-w-screen overflow-hidden">
           <NavBar />
           <Toaster position="top-right" reverseOrder={false} />
           <Content
