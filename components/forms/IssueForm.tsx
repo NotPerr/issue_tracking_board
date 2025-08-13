@@ -143,7 +143,32 @@ export default function IssueForm({
         }
         const repoId = repoIdResult.data.repository.id;
         variables = { repoId, title, body };
+        const createResponse = await fetch("https://api.github.com/graphql", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+            Accept: "application/vnd.github.v4.graphql",
+          },
+          body: JSON.stringify({
+            query: mutationQuery,
+            variables,
+          }),
+        });
+
+        const createResult = await createResponse.json();
+        console.log("created blog", createResult);
+
+        if (!createResponse.ok || createResult.errors) {
+          console.error("GraphQL Errors:", createResult.errors);
+          throw new Error(
+            createResult.errors?.[0]?.message ||
+              "Failed to create issue via GraphQL."
+          );
+        }
+
         onIssueAction(true, successMessage);
+        onClose();
       } else {
         // mode === "edit"
         mutationQuery = UPDATE_ISSUE_MUTATION;
@@ -167,7 +192,6 @@ export default function IssueForm({
         });
 
         const result = await response.json();
-
         if (!response.ok || result.errors) {
           console.error("GraphQL Errors:", result.errors);
           throw new Error(
