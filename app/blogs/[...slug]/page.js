@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import BlogPostClient from "@/components/BlogPostClient";
 import NextAuthSessionProvider from "@/providers/NextAuthSessionProvider";
 
