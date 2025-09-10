@@ -2,7 +2,7 @@ import Content from "@/components/Content";
 import NextAuthSessionProvider from "@/providers/NextAuthSessionProvider";
 import { getIssues } from "@/lib/github";
 import { IssueDataResponse } from "@/types/github";
-import { Toaster } from "react-hot-toast";
+
 import NavBar from "@/components/NavBar";
 
 export default async function Home() {
@@ -15,7 +15,6 @@ export default async function Home() {
       <NextAuthSessionProvider>
         <main className="flex flex-col  items-center sm:items-start max-w-screen overflow-hidden">
           <NavBar />
-          <Toaster position="top-right" reverseOrder={false} />
           <Content
             initialIssues={initialIssuesData.nodes || []}
             initialEndCursor={initialIssuesData.pageInfo?.endCursor || null}

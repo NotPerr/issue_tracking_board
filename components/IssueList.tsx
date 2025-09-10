@@ -170,11 +170,7 @@ export default function IssueList({
       </h2>
       <div className="grid p-5 w-full grid-cols-1 gap-y-2 md:grid-cols-2 md:gap-x-2">
         {issues.map((issue) => (
-          <IssueItem
-            key={issue.id}
-            issue={issue}
-            onIssueAction={handleIssueAction}
-          />
+          <IssueItem key={issue.id} issue={issue} />
         ))}
       </div>
 

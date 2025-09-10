@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 
-const GITHUB_REPO_OWNER = "NotPerr";
-const GITHUB_REPO_NAME = "issue_tracking_board";
+const GITHUB_REPO_OWNER = process.env.GITHUB_REPO_OWNER;
+const GITHUB_REPO_NAME = process.env.GITHUB_REPO_NAME;
 const ISSUES_PER_FETCH = 10;
-const COMMENTS_PER_ISSUE = 5;
 
 const ISSUE_LIST_QUERY = `
   query GetRepoIssues($owner: String!, $repo: String!, $first: Int!, $after: String) {
@@ -17,33 +16,22 @@ const ISSUE_LIST_QUERY = `
           id
           number
           title
-          body
+          body,
+          bodyHTML,
           createdAt
           url
           state
           author {
             login
             url
-          }
+        }
           labels(first: 5) {
             nodes {
               name
               color
             }
           }
-          comments(first: ${COMMENTS_PER_ISSUE}, orderBy: {field: UPDATED_AT, direction: DESC}) {
-             nodes {
-                id
-                author {
-                  login
-                  url
-                }
-                bodyHTML
-                createdAt
-                updatedAt
-              }
-              totalCount
-            }
+         
         }
       }
     }
