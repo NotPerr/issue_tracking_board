@@ -11,7 +11,6 @@ interface IssueListProps {
   initialEndCursor: string | null;
   initialHasNextPage: boolean;
   refreshListKey: number;
-  handleIssueAction: (success: boolean, msg: string) => void;
 }
 
 export default function IssueList({
@@ -19,7 +18,6 @@ export default function IssueList({
   initialEndCursor,
   initialHasNextPage,
   refreshListKey,
-  handleIssueAction,
 }: IssueListProps) {
   const { status } = useAuthStatus(); // Get session for accessToken
 

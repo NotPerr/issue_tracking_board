@@ -48,7 +48,6 @@ export default function Content({
           initialEndCursor={initialEndCursor}
           initialHasNextPage={initialHasNextPage}
           refreshListKey={refreshListKey} // This triggers IssueList to re-fetch
-          handleIssueAction={handleIssueAction} // Pass action handler down
         />
       )}
     </>
