@@ -20,12 +20,7 @@ const SINGLE_ISSUE_QUERY = `
           login
           url
         }
-        labels(first: 5) {
-          nodes {
-            name
-            color
-          }
-        }
+        
         comments(first: 20, orderBy: {field: UPDATED_AT, direction: DESC}) {
           nodes {
             id

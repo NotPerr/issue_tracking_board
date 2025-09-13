@@ -25,12 +25,7 @@ const ISSUE_LIST_QUERY = `
             login
             url
         }
-          labels(first: 5) {
-            nodes {
-              name
-              color
-            }
-          }
+          
          
         }
       }

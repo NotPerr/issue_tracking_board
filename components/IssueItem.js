@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { formatCommentDate, formatIssueDate } from "@/utils/format";
 import Link from "next/link";
 
@@ -59,25 +58,7 @@ export default function IssueItem({ issue }) {
               </>
             )}
           </div>
-          {/* Labels */}
-          {issue.labels &&
-            issue.labels.nodes &&
-            issue.labels.nodes.length > 0 && (
-              <div className="mb-3 flex flex-wrap gap-2">
-                {issue.labels.nodes.map((label) => (
-                  <span
-                    key={label.name}
-                    className="inline-block text-xs font-medium px-2.5 py-0.5 rounded-full"
-                    style={{
-                      backgroundColor: `#${label.color}`,
-                      color: getContrastColor(`#${label.color}`),
-                    }}
-                  >
-                    {label.name}
-                  </span>
-                ))}
-              </div>
-            )}
+
           {/* Issue Body Snippet */}
           {issue.bodyHTML && (
             <div
@@ -145,22 +126,4 @@ export default function IssueItem({ issue }) {
       </Link>
     </div>
   );
-}
-
-// Helper function to determine a good contrasting text color (black or white)
-function getContrastColor(hexcolor) {
-  // If hexcolor starts with #, remove it
-  if (hexcolor.startsWith("#")) {
-    hexcolor = hexcolor.slice(1);
-  }
-  // Convert hex to RGB
-  const r = parseInt(hexcolor.substr(0, 2), 16);
-  const g = parseInt(hexcolor.substr(2, 2), 16);
-  const b = parseInt(hexcolor.substr(4, 2), 16);
-
-  // Calculate luminance (YIQ color space)
-  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-
-  // Return black for light colors, white for dark colors
-  return yiq >= 128 ? "black" : "white";
 }

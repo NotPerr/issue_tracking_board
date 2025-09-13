@@ -161,25 +161,7 @@ export default function BlogPostClient({ issueNumber }) {
               </>
             )}
           </p>
-          {/* Labels */}
-          {issue.labels &&
-            issue.labels.nodes &&
-            issue.labels.nodes.length > 0 && (
-              <div className="mb-3 flex flex-wrap gap-2">
-                {issue.labels.nodes.map((label) => (
-                  <span
-                    key={label.name}
-                    className="inline-block text-xs font-medium px-2.5 py-0.5 rounded-full"
-                    style={{
-                      backgroundColor: `#${label.color}`,
-                      color: getContrastColor(`#${label.color}`),
-                    }}
-                  >
-                    {label.name}
-                  </span>
-                ))}
-              </div>
-            )}
+
           {/* Issue Body */}
           {issue.bodyHTML && (
             <div
